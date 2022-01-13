@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javacode.springboot_program.mapper.VideoMapper">
+    <select id="listVideo" resultType="Video">
+    select * from video
+  </select>
+
+    <!--轮播图-->
+    <select id="listBanner" resultType="VideoBanner">
+        select * from video_banner order by weight asc
+    </select>
+
+    <!--根据视频video_id查询视频详情映射-->
+    <resultMap id="findDetailByVideoMap" type="Video">
+        <id column="id" jdbcType="INTEGER" property="id"></id>
+        <result column="title" jdbcType="VARCHAR" property="title"></result>
+        <result column="summary" jdbcType="VARCHAR" property="summary"></result>
+        <result column="cover_img" jdbcType="VARCHAR" property="coverImg"></result>
+        <result column="price" jdbcType="INTEGER" property="price"></result>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"></result>
+        <result column="point" jdbcType="DOUBLE" property="point"></result>
+        <!--一对多，一个视频多个章节-->
+        <collection property="chapterList" ofType="Chapter">
+            <id column="chapter_id" jdbcType="INTEGER" property="id"></id>
+            <result column="video_id" jdbcType="INTEGER" property="videoId"></result>
+            <result column="chapter_title" jdbcType="VARCHAR" property="title"></result>
+            <result column="chapter_ordered" jdbcType="INTEGER" property="ordered"></result>
+            <result column="chapter_create_time" jdbcType="TIMESTAMP" property="createTime"></result>
+            <!--一对多，一个章节多集-->
+            <collection property="episodeList" ofType="Episode">
+                <id column="episode_id" jdbcType="INTEGER" property="id"></id>
+                <result column="episode_title" jdbcType="VARCHAR" property="title"></result>
+                <result column="num" jdbcType="INTEGER" property="num"></result>
+                <result column="episode_ordered" jdbcType="INTEGER" property="ordered"></result>
+                <result column="play_url" jdbcType="VARCHAR" property="playUrl"></result>
+                <result column="episode_chapter_id" jdbcType="INTEGER" property="chapterId"></result>
+                <result column="free" jdbcType="INTEGER" property="free"></result>
+                <result column="episode_video_id" jdbcType="INTEGER" property="videoId"></result>
+                <result column="episode_create_time" jdbcType="TIMESTAMP" property="createTime"></result>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!--根据视频video_id查询视频详情-->
+    <select id="findByVideoId" resultMap="findDetailByVideoMap">
+            select
+            v.id,
+            v.title,
+            v.summary,
+            v.cover_img,
+            v.price,
+            v.create_time,
+            v.c_id,
+            v.point,
+            c.id as chapter_id,
+            c.video_id,
+            c.title as chapter_title,
+            c.ordered as chapter_ordered,
+            c.create_time as chapter_create_time,
+            e.id as episode_id,
+            e.title as episode_title,
+            e.num,
+            e.ordered as episode_ordered,
+            e.play_url,
+            e.chapter_id as episode_chapter_id,
+            e.free,
+            e.video_id as episode_video_id,
+            e.create_time as episode_create_time
+
+       from video v  left join  chapter c on v.id = c.video_id  left join episode e on c.id = e.chapter_id
+       where v.id=#{video_id} ORDER BY c.ordered asc ,e.num asc
+    </select>
+    <!--根式视频video_id查询出视频信息-->
+    <select id="findVideoId" resultType="Video">
+        select * from video where id = #{video_id}
+    </select>
+
+
+</mapper>

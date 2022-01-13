@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.javacode.springboot_program.mapper.UserMapper">
+    <!--用户注册-->
+    <insert id="register" parameterType="User">
+        insert into user(name,pwd,phone,head_img,create_time)values(#{name},#{pwd},#{phone},#{headImg},#{createTime})
+    </insert>
+
+    <!--用户登录-->
+    <select id="findPwdAndPhone" resultType="User">
+        select * from user where phone = #{phone} and pwd = #{pwd}
+    </select>
+
+    <!--根据token查询用户信息-->
+    <select id="find_by_token" resultType="User">
+        select  * from user where id =#{userId}
+    </select>
+</mapper>
